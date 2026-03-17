@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ActivityService {
@@ -29,16 +31,38 @@ public class ActivityService {
             throw  new RuntimeException("Invalid User: " + request.getUserId());
         }
 
-        Activity activity = Activity.builder()
-                .userId(request.getUserId())
-                .type(request.getType())
-                .duration(request.getDuration())
-                .caloriesBurned(request.getCaloriesBurned())
-                .startTime(request.getStartTime())
-                .additionalMetrics(request.getAdditionalMetrics())
-                .build();
+        Optional<Activity> existingActivity =
+                activityRepository.findByUserIdAndTypeAndStartTime(
+                        request.getUserId(),
+                        request.getType(),
+                        request.getStartTime()
+                );
 
-        Activity savedActivity = activityRepository.save(activity);
+        Activity savedActivity;
+
+        if (existingActivity.isPresent()) {
+            Activity existing = existingActivity.get();
+
+            existing.setDuration(request.getDuration());
+            existing.setCaloriesBurned(request.getCaloriesBurned());
+            existing.setAdditionalMetrics(request.getAdditionalMetrics());
+
+            savedActivity = activityRepository.save(existing); // ✅ update
+        } else {
+            Activity activity = Activity.builder()
+                    .userId(request.getUserId())
+                    .type(request.getType())
+                    .duration(request.getDuration())
+                    .caloriesBurned(request.getCaloriesBurned())
+                    .startTime(request.getStartTime())
+                    .additionalMetrics(request.getAdditionalMetrics())
+                    .build();
+            savedActivity = activityRepository.save(activity);
+        }
+
+
+
+//        Activity savedActivity = activityRepository.save(activity);
 
         try {
             kafkaTemplate.send(topicName, savedActivity.getUserId(), savedActivity);
@@ -64,5 +88,8 @@ public class ActivityService {
     }
 
 
+//    public void deleteByUserAndType(String userId, String type) {
+//        activityRepository.deleteByUserAndType(userId, type);
+//    }
 }
 

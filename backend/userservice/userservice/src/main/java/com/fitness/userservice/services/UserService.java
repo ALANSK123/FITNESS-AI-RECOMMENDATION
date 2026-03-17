@@ -63,4 +63,10 @@ public class UserService {
         log.info("Calling User Service for {}", userId);
         return repository.existsById(userId);
     }
+
+    public void deleteUserById(String userId) {
+        User user = repository.findById(userId)
+                .orElseThrow( () -> new RuntimeException("User not found"));
+        repository.delete(user);
+    }
 }

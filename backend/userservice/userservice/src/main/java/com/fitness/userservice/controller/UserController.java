@@ -30,4 +30,12 @@ public class UserController {
     public ResponseEntity<Boolean> validateUser(@PathVariable String userId) {
         return ResponseEntity.ok(userService.existByUserId(userId));
     }
+
+
+    // ✅ New DELETE endpoint
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String userId) {
+        userService.deleteUserById(userId); // Call service method
+        return ResponseEntity.noContent().build(); // 204 No Content
+    }
 }
