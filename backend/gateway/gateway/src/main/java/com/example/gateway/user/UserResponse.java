@@ -1,6 +1,7 @@
-package com.fitness.userservice.dto;
+package com.example.gateway.user;
 
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Data

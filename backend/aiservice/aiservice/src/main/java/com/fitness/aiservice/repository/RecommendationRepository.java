@@ -2,10 +2,12 @@ package com.fitness.aiservice.repository;
 
 import com.fitness.aiservice.model.Recommendation;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import java.util.List;
 import java.util.Optional;
 
+@EnableMongoRepositories
 public interface RecommendationRepository extends MongoRepository<Recommendation, String> {
     List<Recommendation> findByUserId(String userId);
 
