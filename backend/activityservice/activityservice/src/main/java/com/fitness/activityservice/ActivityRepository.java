@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @EnableMongoRepositories
@@ -14,4 +15,6 @@ public interface ActivityRepository extends MongoRepository<Activity, String> {
     Optional<Activity> findByUserIdAndTypeAndStartTime(String userId,
                                                        ActivityType type,
                                                        LocalDateTime startTime);
+
+    List<Activity> findByUserId(String userId);
 }

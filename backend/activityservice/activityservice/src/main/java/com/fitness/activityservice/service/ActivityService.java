@@ -6,14 +6,18 @@ import com.fitness.activityservice.dto.ActivityRequest;
 import com.fitness.activityservice.dto.ActivityResponse;
 import com.fitness.activityservice.model.Activity;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ActivityService {
 
     private final ActivityRepository activityRepository;
@@ -66,8 +70,9 @@ public class ActivityService {
 
         try {
             kafkaTemplate.send(topicName, savedActivity.getUserId(), savedActivity);
+            System.out.println("Send to Kafka: " + savedActivity.getId() );
         } catch(Exception e) {
-            e.printStackTrace();
+            log.error("Failed to publish activity for userId={}", savedActivity.getUserId(), e);
         }
         return mapToResponse(savedActivity);
     }
@@ -85,6 +90,13 @@ public class ActivityService {
         response.setUpdatedAt(activity.getUpdatedAt());
 
         return response;
+    }
+
+    public List<ActivityResponse>  getUserActivities(String userId) {
+        List<Activity> activityList =  activityRepository.findByUserId(userId);
+        return activityList.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
 
