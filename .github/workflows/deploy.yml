@@ -33,7 +33,7 @@ jobs:
       - name: Build and push Eureka
         uses: docker/build-push-action@v5
         with:
-          context: ./backend/eureka/eureka
+          context: ./backend/eureka
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/fitness-eureka:latest
 
