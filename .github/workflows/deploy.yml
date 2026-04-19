@@ -96,7 +96,7 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd ~/fitness-ai-recommendation
+            cd ~/FITNESS-AI-RECOMMENDATION
             git pull origin main
             # Update images and restart
             docker-compose -f docker-compose.prod.yml pull
