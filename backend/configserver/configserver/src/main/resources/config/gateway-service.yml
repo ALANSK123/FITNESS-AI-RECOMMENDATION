@@ -1,10 +1,7 @@
 spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://localhost:8181/realms/fitness-ai-app/protocol/openid-connect/certs
-
+app:
+  jwt:
+    secret: ${JWT_SECRET:bXlTdXBlclNlY3JldEtleUZvckZpdG5lc3NBcHBKV1QyMDI1}
 
   cloud:
     gateway:
@@ -12,12 +9,15 @@ spring:
         webflux:
 
           routes:
+            - id: auth-service
+              uri: lb://AUTH-SERVICE
+              predicates:
+                - Path=/api/auth/**
+
             - id: user-service
               uri: lb://USER-SERVICE
               predicates:
                 - Path=/api/users/**
-    #          filters:
-    #            - StripPrefix=0
 
             - id: activity-service
               uri: lb://ACTIVITY-SERVICE
@@ -36,4 +36,4 @@ eureka:
       defaultZone: http://localhost:8761/eureka
 
 server:
-  port: 8080
+  port: 8080

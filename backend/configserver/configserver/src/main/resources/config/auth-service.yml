@@ -1,0 +1,25 @@
+spring:
+
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:postgres}:5432/${POSTGRES_DB:microservices_db}
+    username: ${POSTGRES_USER:user}
+    password: ${POSTGRES_PASSWORD:password}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+server:
+  port: 8084
+
+app:
+  jwt:
+    # Generate a Base64-encoded 256-bit secret: openssl rand -base64 32
+    secret: ${JWT_SECRET:bXlTdXBlclNlY3JldEtleUZvckZpdG5lc3NBcHBKV1QyMDI1}
+    expiration-ms: 86400000 # 24 hours

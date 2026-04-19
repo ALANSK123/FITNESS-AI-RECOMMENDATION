@@ -65,6 +65,14 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/fitness-aiservice:latest
 
+      # Build & Push Auth Service (replaces Keycloak)
+      - name: Build and push Auth Service
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend/authservice/authservice
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/fitness-authservice:latest
+
       # Build & Push Frontend
       - name: Build and push Frontend
         uses: docker/build-push-action@v5

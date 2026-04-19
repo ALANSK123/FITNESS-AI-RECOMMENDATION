@@ -7,8 +7,8 @@ import com.fitness.activityservice.dto.ActivityResponse;
 import com.fitness.activityservice.model.Activity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,10 +22,13 @@ public class ActivityService {
 
     private final ActivityRepository activityRepository;
     private final UserValidationService userValidationService;
-    private final KafkaTemplate<String, Activity> kafkaTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
-    @Value("${kafka.topic.name}")
-    private String topicName;
+    @Value("${rabbitmq.exchange.name}")
+    private String exchange;
+
+    @Value("${rabbitmq.routing.key}")
+    private String routingKey;
 
     public ActivityResponse trackActivity(ActivityRequest request) {
 
@@ -51,7 +54,7 @@ public class ActivityService {
             existing.setCaloriesBurned(request.getCaloriesBurned());
             existing.setAdditionalMetrics(request.getAdditionalMetrics());
 
-            savedActivity = activityRepository.save(existing); // ✅ update
+            savedActivity = activityRepository.save(existing);
         } else {
             Activity activity = Activity.builder()
                     .userId(request.getUserId())
@@ -64,13 +67,9 @@ public class ActivityService {
             savedActivity = activityRepository.save(activity);
         }
 
-
-
-//        Activity savedActivity = activityRepository.save(activity);
-
         try {
-            kafkaTemplate.send(topicName, savedActivity.getUserId(), savedActivity);
-            System.out.println("Send to Kafka: " + savedActivity.getId() );
+            rabbitTemplate.convertAndSend(exchange, routingKey, savedActivity);
+            log.info("Sent to RabbitMQ: {}", savedActivity.getId());
         } catch(Exception e) {
             log.error("Failed to publish activity for userId={}", savedActivity.getUserId(), e);
         }
@@ -92,16 +91,10 @@ public class ActivityService {
         return response;
     }
 
-    public List<ActivityResponse>  getUserActivities(String userId) {
-        List<Activity> activityList =  activityRepository.findByUserId(userId);
+    public List<ActivityResponse> getUserActivities(String userId) {
+        List<Activity> activityList = activityRepository.findByUserId(userId);
         return activityList.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
-
-
-//    public void deleteByUserAndType(String userId, String type) {
-//        activityRepository.deleteByUserAndType(userId, type);
-//    }
 }
-
