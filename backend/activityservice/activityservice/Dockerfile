@@ -1,12 +1,12 @@
 # Build Stage
-FROM amazoncorretto:17-alpine AS build
+FROM amazoncorretto:21-alpine AS build
 WORKDIR /app
 COPY . .
 RUN chmod +x mvnw
 RUN ./mvnw clean package -DskipTests
 
 # Runtime Stage
-FROM amazoncorretto:17-alpine
+FROM amazoncorretto:21-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 # No EXPOSE needed here if only Gateway is public,
