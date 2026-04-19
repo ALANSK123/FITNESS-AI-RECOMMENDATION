@@ -34,7 +34,7 @@ services:
 
   eureka:
     build:
-      context: ./backend/eureka/eureka
+      context: ./backend/eureka
       dockerfile: Dockerfile
     restart: always
     depends_on: [ "configserver" ]
