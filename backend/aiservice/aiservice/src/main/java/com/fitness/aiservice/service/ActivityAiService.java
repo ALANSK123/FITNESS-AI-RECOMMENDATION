@@ -7,7 +7,6 @@ import com.fitness.aiservice.model.Activity;
 import com.fitness.aiservice.model.Recommendation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
